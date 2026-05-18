@@ -19,6 +19,7 @@ async function main() {
     const settings = {
         k: 5,
         lambda: 0.5,
+        weakQuiescence: true,
         strongQuiescence: true,
         isotropy: true,
         reset: () => {
@@ -56,7 +57,9 @@ async function main() {
             }
         }
 
-        transitionTable[0] = 0;
+        if (settings.weakQuiescence || settings.strongQuiescence) {
+            transitionTable[0] = 0;
+        }
 
         if (settings.strongQuiescence) {
             for (let s = 1; s < k; s++) {
@@ -75,7 +78,25 @@ async function main() {
         reset();
     });
     gui.add(settings, 'lambda', 0, 1).name('Lambda').onChange(() => { updateTransitionTable(); reset(); });
-    gui.add(settings, 'strongQuiescence').name('Strong Quiescence').onChange(() => { updateTransitionTable(); reset(); });
+
+    let weakController = gui.add(settings, 'weakQuiescence').name('Weak Quiescence').onChange((v) => {
+        if (!v && settings.strongQuiescence) {
+            settings.strongQuiescence = false;
+            strongController.updateDisplay();
+        }
+        updateTransitionTable();
+        reset();
+    });
+
+    let strongController = gui.add(settings, 'strongQuiescence').name('Strong Quiescence').onChange((v) => {
+        if (v && !settings.weakQuiescence) {
+            settings.weakQuiescence = true;
+            weakController.updateDisplay();
+        }
+        updateTransitionTable();
+        reset();
+    });
+
     gui.add(settings, 'isotropy').name('Isotropy').onChange(() => { updateTransitionTable(); reset(); });
     gui.add(settings, 'reset').name('Reset');
 
