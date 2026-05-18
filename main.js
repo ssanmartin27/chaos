@@ -346,6 +346,7 @@ async function main() {
 
     let step = 0;
 
+
     const reset = () => {
         step = 0;
         stepUniform[0] = step;
